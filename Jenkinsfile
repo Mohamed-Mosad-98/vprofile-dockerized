@@ -12,7 +12,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/abdelrahmanonline4/dockerized-microservices.git'
+                git branch: 'Master', url: 'https://github.com/abdelrahmanonline4/dockerized-microservices.git'
             }
         }
 
