@@ -40,10 +40,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh """
-                    echo $PASS | docker login -u $USER --password-stdin
-                    docker push ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG}
-                    docker push ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG}
-                    docker logout
+                        echo $PASS | docker login -u $USER --password-stdin
+                        docker push ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG}
+                        docker push ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG}
+                        docker logout
                     """
                 }
             }
@@ -52,9 +52,16 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                kubectl apply -f .
-                kubectl rollout status deployment/vprofileapp-deployment || true
-                kubectl rollout status deployment/vprofiledb-deployment || true
+                    # Apply only Kubernetes YAML files
+                    kubectl apply -f app-secret.yml
+                    kubectl apply -f db-CIP.yml
+                    kubectl apply -f mc-CIP.yml
+                    kubectl apply -f mcdep.yml
+                    kubectl apply -f rmq-CIP-service.yml
+                    kubectl apply -f rmq-dep.yml
+                    kubectl apply -f vproapp-service.yml
+                    kubectl apply -f vproappdep.yml
+                    kubectl apply -f vprodbdep.yml
                 '''
             }
         }
@@ -69,3 +76,4 @@ pipeline {
         }
     }
 }
+
