@@ -1,89 +1,131 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # 1. Database Service (MySQL)
+
+  #################################################
+  # MySQL
+  #################################################
+
   db01:
     build:
       context: .
       dockerfile: Dockerfile.db
-    container_name: vprofile-db-container
+
+    container_name: vprofile-db
+
+    restart: unless-stopped
+
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
+
     volumes:
-      - vprofile-db-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p=${DB_PASS}"]
-      interval: 10s
+      test: ["CMD","mysqladmin","ping","-h","localhost","-uroot","-p${DB_PASS}"]
+      interval: 15s
       timeout: 5s
-      retries: 5
-      start_period: 15s
-    restart: unless-stopped
+      retries: 10
+
     networks:
       - vprofile-network
 
-  # 2. Cache Service (Memcached)
+  #################################################
+  # Memcached
+  #################################################
+
   mc01:
     build:
       context: .
       dockerfile: Dockerfile.mc
-    container_name: vprofile-mc-container
+
+    container_name: vprofile-memcached
+
     restart: unless-stopped
+
     networks:
       - vprofile-network
 
-  # 3. Message Broker (RabbitMQ)
+  #################################################
+  # RabbitMQ
+  #################################################
+
   rmq01:
     build:
       context: .
       dockerfile: Dockerfile.rmq
-    container_name: vprofile-rmq-container
+
+    container_name: vprofile-rabbitmq
+
+    restart: unless-stopped
+
     environment:
       RABBITMQ_DEFAULT_USER: ${RMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RMQ_PASS}
+
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
+      test: ["CMD","rabbitmq-diagnostics","-q","ping"]
+      interval: 15s
       timeout: 5s
-      retries: 5
-      start_period: 15s
-    restart: unless-stopped
+      retries: 10
+
     networks:
       - vprofile-network
 
-  # 4. Main Java Application (Tomcat)
+  #################################################
+  # Java Application
+  #################################################
+
   vprofile-app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vprofile-app-container
-    ports:
-      - "8080:8080"
+
+    container_name: vprofile-app
+
+    restart: unless-stopped
+
     depends_on:
       db01:
         condition: service_healthy
       rmq01:
         condition: service_healthy
-    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
     networks:
       - vprofile-network
 
-  # 5. Second Application (Nginx)
+  #################################################
+  # Second Application (Nginx)
+  #################################################
+
   second-app:
     build:
       context: ./second-app
-      dockerfile: Dockerfile
-    container_name: second-app-container
+
+    container_name: second-app
+
+    restart: unless-stopped
+
     ports:
       - "8081:80"
-    restart: unless-stopped
+
     networks:
       - vprofile-network
 
-# Persistent Volume
-volumes:
-  vprofile-db-data:
+#################################################
+# Volumes
+#################################################
 
-# Internal Network
+volumes:
+  mysql-data:
+
+#################################################
+# Network
+#################################################
+
 networks:
   vprofile-network:
     driver: bridge
