@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. خدمة قاعدة البيانات (MySQL)
+  # 1. Database Service (MySQL)
   db01:
     build:
       context: .
@@ -12,25 +12,26 @@ services:
     volumes:
       - vprofile-db-data:/var/lib/mysql
     healthcheck:
-      # بنستخدم المتغير جوه أمر الـ Healthcheck كمان
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p=${DB_PASS}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 15s
+    restart: unless-stopped
     networks:
       - vprofile-network
 
-  # 2. خدمة الكاش (Memcached)
+  # 2. Cache Service (Memcached)
   mc01:
     build:
       context: .
       dockerfile: Dockerfile.mc
     container_name: vprofile-mc-container
+    restart: unless-stopped
     networks:
       - vprofile-network
 
-  # 3. خدمة الرسائل (RabbitMQ)
+  # 3. Message Broker (RabbitMQ)
   rmq01:
     build:
       context: .
@@ -45,30 +46,44 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+    restart: unless-stopped
     networks:
       - vprofile-network
 
-  # 4. خدمة التطبيق (Tomcat / Java App)
+  # 4. Main Java Application (Tomcat)
   vprofile-app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vprofile-app-container
     ports:
-      - "8080:8080" # ربط بورت 8080 في لابتوبك ببورت الكونتينر الداخلي
+      - "8080:8080"
     depends_on:
       db01:
         condition: service_healthy
       rmq01:
         condition: service_healthy
+    restart: unless-stopped
     networks:
       - vprofile-network
 
-# تعريف الـ Volumes لاستمرارية البيانات
+  # 5. Second Application (Nginx)
+  second-app:
+    build:
+      context: ./second-app
+      dockerfile: Dockerfile
+    container_name: second-app-container
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    networks:
+      - vprofile-network
+
+# Persistent Volume
 volumes:
   vprofile-db-data:
 
-# تعريف الشبكة الداخلية لعزل الخدمات وتفعيل الـ Internal DNS
+# Internal Network
 networks:
   vprofile-network:
     driver: bridge
