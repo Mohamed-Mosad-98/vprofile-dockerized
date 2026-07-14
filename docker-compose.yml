@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # 1. خدمة قاعدة البيانات (MySQL)
+  db01:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: vprofile-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+    volumes:
+      - vprofile-db-data:/var/lib/mysql
+    healthcheck:
+      # بنستخدم المتغير جوه أمر الـ Healthcheck كمان
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p=${DB_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - vprofile-network
+
+  # 2. خدمة الكاش (Memcached)
+  mc01:
+    build:
+      context: .
+      dockerfile: Dockerfile.mc
+    container_name: vprofile-mc-container
+    networks:
+      - vprofile-network
+
+  # 3. خدمة الرسائل (RabbitMQ)
+  rmq01:
+    build:
+      context: .
+      dockerfile: Dockerfile.rmq
+    container_name: vprofile-rmq-container
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASS}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - vprofile-network
+
+  # 4. خدمة التطبيق (Tomcat / Java App)
+  vprofile-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vprofile-app-container
+    ports:
+      - "8080:8080" # ربط بورت 8080 في لابتوبك ببورت الكونتينر الداخلي
+    depends_on:
+      db01:
+        condition: service_healthy
+      rmq01:
+        condition: service_healthy
+    networks:
+      - vprofile-network
+
+# تعريف الـ Volumes لاستمرارية البيانات
+volumes:
+  vprofile-db-data:
+
+# تعريف الشبكة الداخلية لعزل الخدمات وتفعيل الـ Internal DNS
+networks:
+  vprofile-network:
+    driver: bridge

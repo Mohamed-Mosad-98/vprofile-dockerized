@@ -1,0 +1,11 @@
+FROM mysql:8.0
+
+# إعداد متغيرات البيئة الأساسية (نفس البيانات اللي الأبلكيشن مبرمج عليها)
+
+ENV MYSQL_DATABASE=accounts
+
+# نسخ ملف الـ SQL backup اللي نزل معانا من الجيت هب للفولدر السحري جوه الكونتينر
+COPY src/main/resources/db_backup.sql /docker-entrypoint-initdb.d/
+
+# فتح بورت الـ MySQL الشهير
+EXPOSE 3306
