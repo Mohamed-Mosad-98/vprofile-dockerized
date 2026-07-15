@@ -1,4 +1,4 @@
-# 🚀 VProfile Dockerized Deployment on AWS using Terraform
+#  VProfile Dockerized Deployment on AWS using Terraform
 
 Deploying the VProfile Java application on AWS using Docker, Docker Compose, Terraform, and an Application Load Balancer (ALB) with path-based routing.
 
@@ -28,7 +28,7 @@ This project demonstrates how to provision AWS infrastructure using Terraform, d
 
 # 🏗 Architecture Diagram
 
-![Architecture Diagram](screenshots/architecture-diagram.png)
+<img width="1536" height="1024" alt="diagram" src="https://github.com/user-attachments/assets/4771f47c-cbad-441f-bdab-045a91fe6ea9" />
 
 ---
 
@@ -127,64 +127,58 @@ The deployment consists of five containers.
 
 # 📸 Deployment Screenshots
 
-## 1. Architecture Diagram
 
-![Architecture](screenshots/architecture-diagram.png)
-
----
-
-## 2. Terraform Deployment
+## 1. Terraform Deployment
 
 Terraform successfully provisioned the AWS infrastructure.
 
-![Terraform Apply](screenshots/terraform-deployment.png)
+<img width="1920" height="1080" alt="terraform apply" src="https://github.com/user-attachments/assets/2c285a38-5831-46ad-bdf7-78f01d9047fc" />
+
 
 ---
 
-## 3. AWS Network (VPC & Subnets)
+## 2. AWS Network (VPC & Subnets)
 
 Custom VPC with networking resources created by Terraform.
 
-![VPC](screenshots/vpc.png)
+<img width="1920" height="1080" alt="vpc" src="https://github.com/user-attachments/assets/8d43ca8d-fce4-4320-9169-fe7dfb8c3e5d" />
+
 
 ---
 
-## 4. EC2 Instance
 
-Docker host running all application containers.
-
-![EC2](screenshots/ec2-instance.png)
-
----
-
-## 5. Application Load Balancer
+## 3. Application Load Balancer
 
 Internet-facing ALB exposing the applications.
 
-![ALB](screenshots/alb.png)
+<img width="1920" height="1080" alt="LB" src="https://github.com/user-attachments/assets/3fb2752a-1acb-4d2e-b9a3-6dff9d75d5b2" />
 
 ---
 
-## 6. Listener Rules
+## 4. Listener Rules
 
 Path-based routing configuration.
 
 - `/` → Java Application
 - `/second/*` → Nginx Application
+<img width="1920" height="1080" alt="LISITENER" src="https://github.com/user-attachments/assets/35b53f01-28f5-48dd-b082-08d798e07e52" />
 
-![Listener Rules](screenshots/listener-rules.png)
+
 
 ---
 
-## 7. Target Groups
+## 5. Target Groups
 
 Healthy Target Groups attached to the ALB.
 
-![Target Groups](screenshots/target-groups.png)
+<img width="1920" height="1080" alt="JAVA-TARGET GROUP" src="https://github.com/user-attachments/assets/8352ba76-21a8-4534-b1eb-4142fb764a64" />
+
+<img width="1920" height="1080" alt="NGINX-TARGET GROUP" src="https://github.com/user-attachments/assets/ea9dd086-8468-437e-8086-f07f437a7bae" />
+
 
 ---
 
-## 8. Docker Containers
+## 6. Docker Containers
 
 Running Docker containers inside the EC2 instance.
 
@@ -192,27 +186,30 @@ Running Docker containers inside the EC2 instance.
 docker ps
 ```
 
-![Docker Containers](screenshots/docker-containers.png)
+<img width="1920" height="1080" alt="DOCKER PS" src="https://github.com/user-attachments/assets/d17f88d6-47fb-429f-b538-3f91d5a59f34" />
+
 
 ---
 
-## 9. Java Application
+## 7. Java Application
 
 VProfile Java application running successfully.
 
-![Java App](screenshots/java-app.png)
+<img width="1920" height="1080" alt="SIGN UP PAGE" src="https://github.com/user-attachments/assets/1d3e1dfc-1b35-4dd3-ae43-d4ad169b5269" />
+
 
 ---
 
-## 10. Second Application
+## 8. Second Application
 
 Nginx static website served through the ALB.
 
-![Second App](screenshots/second-app.png)
+<img width="1920" height="1080" alt="SECOND APP" src="https://github.com/user-attachments/assets/3da46ad0-6530-4de1-ad33-87fd44630789" />
+
 
 ---
 
-# 🚀 Deployment Steps
+#  Deployment Steps
 
 ### Clone Repository
 
